@@ -44,8 +44,9 @@ public class IntentBridgedPreferences implements SharedPreferences {
      *
      * @param context The {@link Context} of this app.
      * @param actionName The actionName of the action.
+     * @param extras The Map<String, String> extras you want to send to server.
      */
-    public IntentBridgedPreferences(Context context, String actionName) {
+    public IntentBridgedPreferences(Context context, String actionName, Map<String, String> extras) {
         mCachedPreferences = context.getSharedPreferences(actionName, Context.MODE_PRIVATE);
         mPreferencesIntentFilter = new IntentFilter(actionName + ".PREFERENCES");
         mPreferencesReceiver = new IntentBridgedPreferencesReceiver(mCachedPreferences);
@@ -59,6 +60,10 @@ public class IntentBridgedPreferences implements SharedPreferences {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.DONUT) {
             intent = intent.setPackage(actionName);
         }
+
+        // using for-each loop for iteration over Map.entrySet()
+        for (Map.Entry<String,String> entry : extras.entrySet())
+            intent.putExtra(entry.getKey(), entry.getValue());
 
         context.sendBroadcast(intent);
     }
